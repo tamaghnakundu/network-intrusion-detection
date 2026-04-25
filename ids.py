@@ -1,6 +1,8 @@
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
@@ -35,14 +37,10 @@ test['label'] = test['label'].apply(
 
 
 # Label-encode categorical features
-# using combined train+test values
-# to ensure consistent category mappings
-for col in ['protocol_type','service','flag']:
+for col in ['protocol_type', 'service', 'flag']:
 
     le = LabelEncoder()
-
     allvals = pd.concat([train[col], test[col]])
-
     le.fit(allvals)
 
     train[col] = le.transform(train[col])
@@ -57,48 +55,87 @@ X_test = test.drop('label', axis=1)
 y_test = test['label']
 
 
-# Replace any missing values with 0
-# to ensure clean numeric input for model training
+# Replace missing values
 X_train = X_train.fillna(0)
 X_test = X_test.fillna(0)
 
 
-# Initialize Random Forest classifier
-model = RandomForestClassifier(
-    n_estimators=100,
+# ================= RANDOM FOREST =================
+
+model_rf = RandomForestClassifier(
+    n_estimators=500,
+    class_weight='balanced',
+    max_depth=None,
     random_state=42
 )
 
-# Train the model on the training dataset
-model.fit(X_train, y_train)
+model_rf.fit(X_train, y_train)
+pred_rf = model_rf.predict(X_test)
 
-# Generate predictions on unseen test data
-pred = model.predict(X_test)
+print("\n===== Random Forest Results =====")
+print(classification_report(y_test, pred_rf))
+print("Test Accuracy:", model_rf.score(X_test, y_test))
 
-
-# Evaluate model performance:
-# precision, recall, F1-score, and overall accuracy
-print(classification_report(y_test, pred))
-print("Test Accuracy:", model.score(X_test, y_test))
-
-# Compute and print confusion matrix
-cm = confusion_matrix(y_test, pred)
+cm_rf = confusion_matrix(y_test, pred_rf)
 print("Confusion Matrix:")
-print(cm)
+print(cm_rf)
 
-# Visualize confusion matrix
-plt.figure(figsize=(6,6))
-plt.imshow(cm, interpolation='nearest')
-plt.title("Confusion Matrix")
+
+# ================= LOGISTIC REGRESSION =================
+
+# Scale features (important for Logistic Regression)
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+model_lr = LogisticRegression(
+    class_weight='balanced',
+    max_iter=5000,
+    random_state=42
+)
+
+model_lr.fit(X_train_scaled, y_train)
+pred_lr = model_lr.predict(X_test_scaled)
+
+print("\n===== Logistic Regression Results =====")
+print(classification_report(y_test, pred_lr))
+print("Test Accuracy:", model_lr.score(X_test_scaled, y_test))
+
+cm_lr = confusion_matrix(y_test, pred_lr)
+print("Confusion Matrix:")
+print(cm_lr)
+
+plt.figure(figsize=(12,5))
+
+# Random Forest
+plt.subplot(1,2,1)
+plt.imshow(cm_rf, interpolation='nearest')
+plt.title("Random Forest")
 plt.colorbar()
 plt.xticks([0,1], ['Normal','Attack'])
 plt.yticks([0,1], ['Normal','Attack'])
 plt.xlabel("Predicted")
 plt.ylabel("Actual")
 
-# Annotate confusion matrix cells
 for i in range(2):
     for j in range(2):
-        plt.text(j, i, cm[i,j], ha='center', va='center')
+        plt.text(j, i, cm_rf[i,j], ha='center', va='center')
 
+
+# Logistic Regression
+plt.subplot(1,2,2)
+plt.imshow(cm_lr, interpolation='nearest')
+plt.title("Logistic Regression")
+plt.colorbar()
+plt.xticks([0,1], ['Normal','Attack'])
+plt.yticks([0,1], ['Normal','Attack'])
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+
+for i in range(2):
+    for j in range(2):
+        plt.text(j, i, cm_lr[i,j], ha='center', va='center')
+
+
+plt.tight_layout()
 plt.show()
