@@ -1,58 +1,92 @@
 # Hybrid Intrusion Detection System
 
-A hybrid intrusion detection framework that combines machine learning and rule-based analysis for network attack detection using the NSL-KDD dataset.
+A research-oriented Hybrid Intrusion Detection System (IDS) that combines machine learning and rule-based analysis to detect malicious network traffic. The project employs a weighted ensemble of Random Forest, Logistic Regression, and an adaptive rule engine to improve detection performance while providing confidence estimation and model explainability.
+
+---
 
 ## Overview
 
-This project explores the use of ensemble machine learning and rule-based detection for identifying malicious network traffic. The current implementation combines Random Forest, Logistic Regression, and an adaptive rule engine through a weighted decision fusion strategy.
+Intrusion Detection Systems (IDS) are essential for identifying malicious activities in computer networks. Traditional machine learning approaches often rely on a single classifier, which may struggle with complex attack patterns or produce high false alarm rates.
 
-Future work focuses on explainable AI, modern intrusion detection datasets, and real-time traffic analysis.
+This project investigates a hybrid detection framework that combines the strengths of multiple machine learning models with rule-based analysis. Rather than relying on a single prediction, the system aggregates outputs from different components using a weighted ensemble strategy and estimates the confidence of each prediction.
+
+The long-term objective is to develop an explainable and extensible IDS that can be evaluated on modern intrusion detection datasets and deployed for real-time network monitoring.
 
 ---
 
 ## Features
 
-- Binary attack classification
+- Binary network intrusion detection (Normal / Attack)
 - Random Forest classifier
 - Logistic Regression classifier
 - Adaptive rule-based detection
 - Weighted hybrid ensemble
 - Confidence score estimation
 - Feature importance analysis
+- SHAP-based model explainability
 - Confusion matrix visualization
+- Error analysis framework
 
 ---
 
-## Architecture
+## System Architecture
 
 ```text
-Network Traffic
-       │
-       ▼
-Data Preprocessing
-       │
- ┌─────┼─────┐
- ▼     ▼     ▼
-RF     LR   Rule Engine
- \      |      /
-  \     |     /
-   Weighted Ensemble
-          │
-          ▼
- Confidence Score
-          │
-          ▼
- Final Prediction
+                    Network Traffic
+                           │
+                           ▼
+                  Data Preprocessing
+                           │
+          ┌────────────────┼────────────────┐
+          ▼                ▼                ▼
+   Random Forest   Logistic Regression   Rule Engine
+          │                │                │
+          └────────────────┼────────────────┘
+                           ▼
+                 Weighted Ensemble Decision
+                           ▼
+                 Confidence Score Estimation
+                           ▼
+                     Final Classification
+                           ▼
+                  Explainability (SHAP)
 ```
+
+---
+
+## Methodology
+
+The current implementation consists of the following stages:
+
+1. **Data Preprocessing**
+   - Binary attack labeling
+   - Label encoding of categorical features
+   - Missing value handling
+   - Feature scaling for Logistic Regression
+
+2. **Machine Learning Models**
+   - Random Forest
+   - Logistic Regression
+
+3. **Adaptive Rule Engine**
+   - Rule thresholds automatically derived from the training dataset
+   - Used as an additional decision source
+
+4. **Hybrid Decision Fusion**
+   - Weighted combination of model probabilities and rule-based output
+   - Confidence estimation for every prediction
+
+5. **Model Explainability**
+   - Global feature importance using SHAP
+   - Local prediction explanations using SHAP waterfall plots
 
 ---
 
 ## Dataset
 
-- NSL-KDD
-- Binary classification (Normal / Attack)
+This project currently uses the **NSL-KDD** dataset for binary intrusion detection.
 
-Required files:
+### Required Files
 
 - `KDDTrain+.txt`
 - `KDDTest+.txt`
@@ -73,26 +107,43 @@ Required files:
 
 ## Installation
 
+Clone the repository:
+
 ```bash
-pip install pandas numpy scikit-learn matplotlib
+git clone https://github.com/<your-username>/Hybrid-IDS.git
+cd Hybrid-IDS
+```
+
+Install the required packages:
+
+```bash
+pip install pandas numpy scikit-learn matplotlib shap
 ```
 
 ---
 
-## Future Work
-
-- SHAP explainability
-- False positive analysis
-- CICIDS2017 support
-- Real-time intrusion detection
-- Deep learning models
-
----
-
-## Technologies
+## Technologies Used
 
 - Python
 - Pandas
 - NumPy
 - Scikit-learn
 - Matplotlib
+- SHAP
+
+---
+
+## Future Work
+
+- Comprehensive false positive and false negative analysis
+- Cross-dataset evaluation using CICIDS2017 and UNSW-NB15
+- Real-time packet capture and intrusion detection
+- Deep learning-based detection models
+- Explainable AI dashboard for security analysts
+- Web-based visualization interface
+
+---
+
+## License
+
+This project is intended for educational and research purposes.
