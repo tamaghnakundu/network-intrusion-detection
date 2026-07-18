@@ -111,7 +111,7 @@ Clone the repository:
 
 ```bash
 git clone https://github.com/tamaghnakundu/network-intrusion-detection.git
-cd Hybrid-IDS
+cd network-intrusion-detection
 ```
 
 Install the required packages:
