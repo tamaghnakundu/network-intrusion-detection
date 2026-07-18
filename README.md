@@ -110,7 +110,7 @@ This project currently uses the **NSL-KDD** dataset for binary intrusion detecti
 Clone the repository:
 
 ```bash
-git clone https://github.com/<your-username>/Hybrid-IDS.git
+git clone https://github.com/tamaghnakundu/network-intrusion-detection.git
 cd Hybrid-IDS
 ```
 
