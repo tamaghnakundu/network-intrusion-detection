@@ -1,149 +1,256 @@
-# Hybrid Intrusion Detection System
+# Hybrid Network Intrusion Detection System
 
-A research-oriented Hybrid Intrusion Detection System (IDS) that combines machine learning and rule-based analysis to detect malicious network traffic. The project employs a weighted ensemble of Random Forest, Logistic Regression, and an adaptive rule engine to improve detection performance while providing confidence estimation and model explainability.
-
----
-
-## Overview
-
-Intrusion Detection Systems (IDS) are essential for identifying malicious activities in computer networks. Traditional machine learning approaches often rely on a single classifier, which may struggle with complex attack patterns or produce high false alarm rates.
-
-This project investigates a hybrid detection framework that combines the strengths of multiple machine learning models with rule-based analysis. Rather than relying on a single prediction, the system aggregates outputs from different components using a weighted ensemble strategy and estimates the confidence of each prediction.
-
-The long-term objective is to develop an explainable and extensible IDS that can be evaluated on modern intrusion detection datasets and deployed for real-time network monitoring.
+A modular, explainable Hybrid Network Intrusion Detection System (IDS) built using machine learning and rule-based detection. The system combines Random Forest, Logistic Regression, and an adaptive Rule Engine through a weighted ensemble to improve intrusion detection performance while providing interpretable predictions using SHAP.
 
 ---
 
 ## Features
 
-- Binary network intrusion detection (Normal / Attack)
+- Modular Python project architecture
 - Random Forest classifier
 - Logistic Regression classifier
-- Adaptive rule-based detection
-- Weighted hybrid ensemble
+- Adaptive Rule-Based anomaly detector
+- Weighted Hybrid Ensemble
 - Confidence score estimation
-- Feature importance analysis
 - SHAP-based model explainability
-- Confusion matrix visualization
-- Error analysis framework
+- Automated evaluation and visualization pipeline
+- Reproducible experiments
 
 ---
 
-## System Architecture
+## Project Structure
 
 ```text
-                    Network Traffic
-                           │
-                           ▼
-                  Data Preprocessing
-                           │
-          ┌────────────────┼────────────────┐
-          ▼                ▼                ▼
-   Random Forest   Logistic Regression   Rule Engine
-          │                │                │
-          └────────────────┼────────────────┘
-                           ▼
-                 Weighted Ensemble Decision
-                           ▼
-                 Confidence Score Estimation
-                           ▼
-                     Final Classification
-                           ▼
-                  Explainability (SHAP)
+network-intrusion-detection/
+│
+├── data/
+│   ├── feature_names.txt
+│   └── README.md
+│
+├── notebooks/
+│   └── hybrid_ids_analysis.ipynb
+│
+├── results/
+│   ├── figures/
+│   ├── reports/
+│   └── tables/
+│
+├── src/
+│   ├── data/
+│   ├── evaluation/
+│   ├── explainability/
+│   ├── models/
+│   └── visualization/
+│
+├── outputs/              # Generated automatically (ignored by Git)
+│
+├── main.py
+├── requirements.txt
+├── .gitignore
+└── README.md
 ```
 
 ---
 
-## Methodology
+# Dataset
 
-The current implementation consists of the following stages:
+This project uses the **NSL-KDD** benchmark dataset for network intrusion detection.
 
-1. **Data Preprocessing**
-   - Binary attack labeling
-   - Label encoding of categorical features
-   - Missing value handling
-   - Feature scaling for Logistic Regression
+The dataset is **not included** in this repository.
 
-2. **Machine Learning Models**
-   - Random Forest
-   - Logistic Regression
+Download the following files and place them inside the `data/` directory:
 
-3. **Adaptive Rule Engine**
-   - Rule thresholds automatically derived from the training dataset
-   - Used as an additional decision source
+```
+KDDTrain+.txt
+KDDTest+.txt
+```
 
-4. **Hybrid Decision Fusion**
-   - Weighted combination of model probabilities and rule-based output
-   - Confidence estimation for every prediction
+The repository already includes:
 
-5. **Model Explainability**
-   - Global feature importance using SHAP
-   - Local prediction explanations using SHAP waterfall plots
+```
+feature_names.txt
+```
 
 ---
 
-## Dataset
+# Methodology
 
-This project currently uses the **NSL-KDD** dataset for binary intrusion detection.
+The proposed IDS consists of four major components.
 
-### Required Files
+## 1. Data Preprocessing
 
-- `KDDTrain+.txt`
-- `KDDTest+.txt`
-- `feature_names.txt`
-
----
-
-## Current Results
-
-| Metric | Value |
-|---------|------:|
-| Accuracy | 85% |
-| Precision | 97% |
-| Recall | 72% |
-| F1-score | 83% |
+- Load NSL-KDD dataset
+- Label encoding of categorical features
+- Missing value handling
+- Feature preparation
+- Binary attack classification
 
 ---
 
-## Installation
+## 2. Machine Learning Models
 
-Clone the repository:
+### Random Forest
+
+- Ensemble tree classifier
+- High detection capability
+- Feature importance analysis
+
+### Logistic Regression
+
+- Linear classifier
+- Standardized features
+- Probability calibration
+
+---
+
+## 3. Rule-Based Detector
+
+A lightweight adaptive detector that identifies suspicious traffic using feature-based heuristics.
+
+The rule engine complements the machine learning models by improving robustness on uncertain samples.
+
+---
+
+## 4. Hybrid Ensemble
+
+The final prediction is obtained using a weighted ensemble:
+
+| Component | Weight |
+|-----------|--------|
+| Random Forest | 0.60 |
+| Logistic Regression | 0.30 |
+| Rule Engine | 0.10 |
+
+The ensemble also computes a confidence score for every prediction.
+
+---
+
+# Explainability
+
+The project integrates **SHAP (SHapley Additive Explanations)** to interpret model decisions.
+
+Available visualizations include:
+
+- SHAP Summary Plot
+- SHAP Beeswarm Plot
+- SHAP Waterfall Plot
+- Random Forest Feature Importance
+
+---
+
+# Results
+
+Representative outputs are provided in the `results/` directory.
+
+## Included
+
+### Figures
+
+- Hybrid IDS Confusion Matrix
+- Feature Importance
+- SHAP Summary
+- SHAP Beeswarm
+
+### Reports
+
+- Random Forest Classification Report
+- Logistic Regression Classification Report
+- Hybrid IDS Classification Report
+
+### Tables
+
+- Feature Importance CSV
+- Sample Predictions
+
+---
+
+# Installation
+
+Clone the repository
 
 ```bash
 git clone https://github.com/tamaghnakundu/network-intrusion-detection.git
+
 cd network-intrusion-detection
 ```
 
-Install the required packages:
+Install dependencies
 
 ```bash
-pip install pandas numpy scikit-learn matplotlib shap
+pip install -r requirements.txt
 ```
 
 ---
 
-## Technologies Used
+# Usage
+
+After downloading the NSL-KDD dataset into the `data/` folder:
+
+```bash
+python main.py
+```
+
+The pipeline automatically:
+
+- loads the dataset
+- preprocesses the data
+- trains all models
+- evaluates performance
+- generates explainability plots
+- saves reports
+- computes hybrid predictions
+
+Generated files are written to the `outputs/` directory.
+
+---
+
+# Repository Contents
+
+| Directory | Description |
+|------------|-------------|
+| `src/` | Source code |
+| `data/` | Dataset configuration |
+| `results/` | Curated figures and reports |
+| `outputs/` | Auto-generated artifacts |
+| `notebooks/` | Research notebook |
+
+---
+
+# Technologies Used
 
 - Python
+- Scikit-learn
+- SHAP
 - Pandas
 - NumPy
-- Scikit-learn
 - Matplotlib
-- SHAP
+- Joblib
 
 ---
 
-## Future Work
+# Future Improvements
 
-- Comprehensive false positive and false negative analysis
-- Cross-dataset evaluation using CICIDS2017 and UNSW-NB15
-- Real-time packet capture and intrusion detection
-- Deep learning-based detection models
-- Explainable AI dashboard for security analysts
-- Web-based visualization interface
+- Deep learning based IDS
+- Streaming intrusion detection
+- Real-time packet analysis
+- AutoML for model selection
+- Explainable ensemble optimization
+- Web-based IDS dashboard
 
 ---
 
-## License
+# License
 
-This project is intended for educational and research purposes.
+This project is released under the MIT License.
+
+---
+
+# Author
+
+**Tamaghna Kundu**
+
+B.Tech Computer Science and Engineering
+
+SOA University
+
+Interested in Machine Learning, Cybersecurity, and Explainable AI.
