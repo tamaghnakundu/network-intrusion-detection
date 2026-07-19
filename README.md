@@ -239,12 +239,6 @@ Generated files are written to the `outputs/` directory.
 
 ---
 
-# License
-
-This project is released under the MIT License.
-
----
-
 # Author
 
 **Tamaghna Kundu**
