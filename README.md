@@ -18,40 +18,6 @@ A modular, explainable Hybrid Network Intrusion Detection System (IDS) built usi
 
 ---
 
-## Project Structure
-
-```text
-network-intrusion-detection/
-│
-├── data/
-│   ├── feature_names.txt
-│   └── README.md
-│
-├── notebooks/
-│   └── hybrid_ids_analysis.ipynb
-│
-├── results/
-│   ├── figures/
-│   ├── reports/
-│   └── tables/
-│
-├── src/
-│   ├── data/
-│   ├── evaluation/
-│   ├── explainability/
-│   ├── models/
-│   └── visualization/
-│
-├── outputs/              # Generated automatically (ignored by Git)
-│
-├── main.py
-├── requirements.txt
-├── .gitignore
-└── README.md
-```
-
----
-
 # Dataset
 
 This project uses the **NSL-KDD** benchmark dataset for network intrusion detection.
