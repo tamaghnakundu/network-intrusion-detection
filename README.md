@@ -17,6 +17,7 @@ The system combines Random Forest, Logistic Regression, and an adaptive Rule Eng
 - SHAP-based model explainability
 - Feature importance analysis
 - Confusion matrix visualization
+- Error analysis
 - Automated evaluation and reporting
 
 ---
@@ -101,32 +102,64 @@ The predictions from the three components are combined using a weighted decision
 
 The system also calculates a confidence score for each final prediction.
 
+The hybrid decision threshold was reduced from the initial `0.50` operating point to `0.30` to improve attack detection recall and the overall precision-recall trade-off.
+
 ---
 
 # Results
 
-The Hybrid IDS was evaluated on the NSL-KDD test dataset containing **22,544 test samples**.
+The Hybrid IDS was evaluated on the **NSL-KDD test dataset containing 22,544 test samples**.
+
+### Model Performance
+
+| Model | Accuracy | Precision | Recall | F1-score |
+|-------|---------:|----------:|-------:|---------:|
+| Random Forest | 77% | 97% | 62% | 75% |
+| Logistic Regression | 76% | 92% | 62% | 74% |
+| **Hybrid IDS** | **81%** | **93%** | **72%** | **81%** |
+
+The Hybrid IDS currently provides the strongest overall performance among the evaluated models, particularly in terms of attack recall and F1-score.
 
 ### Hybrid IDS Performance
 
 | Metric | Hybrid IDS |
 |--------|-----------:|
-| Accuracy | 75.61% |
-| Precision | 96.75% |
-| Recall | 59.14% |
-| F1-score | 73.41% |
+| Accuracy | **80.93%** |
+| Precision | **93.33%** |
+| Recall | **71.61%** |
+| F1-score | **81.04%** |
 
-The Hybrid IDS correctly classified **17,046** out of 22,544 test samples.
+The Hybrid IDS correctly classified **18,244** out of 22,544 test samples.
 
 The evaluation produced:
 
-- **5,498** incorrect predictions
-- **255** false positives
-- **5,243** false negatives
+- **4,300** incorrect predictions
+- **657** false positives
+- **3,643** false negatives
+
+Compared with the original `0.50` decision threshold, the updated threshold substantially reduced false negatives while maintaining relatively high attack precision.
 
 ### Hybrid IDS Confusion Matrix
 
 ![Hybrid IDS Confusion Matrix](results/figures/hybrid_ids_confusion_matrix.png)
+
+---
+
+## Error Analysis
+
+Error analysis is used to examine the false-positive and false-negative behavior of the Hybrid IDS.
+
+At the current operating point:
+
+| Error Type | Count |
+|------------|------:|
+| False Positives | 657 |
+| False Negatives | 3,643 |
+| Total Errors | 4,300 |
+
+The reduction in false negatives indicates improved detection of attack traffic compared with the original hybrid configuration.
+
+Further analysis of model disagreements is used to identify cases where Random Forest, Logistic Regression, and the Rule Engine produce different predictions.
 
 ---
 
@@ -188,9 +221,10 @@ The pipeline:
 5. Runs the rule-based detector
 6. Generates hybrid predictions
 7. Evaluates model performance
-8. Generates feature importance visualizations
-9. Generates SHAP explanations
-10. Saves reports and generated outputs
+8. Performs error analysis
+9. Generates feature importance visualizations
+10. Generates SHAP explanations
+11. Saves reports and generated outputs
 
 Automatically generated files are written to the `outputs/` directory.
 
@@ -211,8 +245,9 @@ Automatically generated files are written to the `outputs/` directory.
 # Future Improvements
 
 - Evaluation on modern intrusion detection datasets
-- Detailed false positive and false negative analysis
+- Further false-positive and false-negative analysis
 - Improved hybrid decision fusion
+- Systematic threshold and weight optimization
 - Deep learning-based intrusion detection
 - Real-time network traffic analysis
 - Extended explainability for the hybrid ensemble
