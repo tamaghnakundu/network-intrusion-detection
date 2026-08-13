@@ -2,6 +2,8 @@
 Main entry point for the Hybrid Intrusion Detection System.
 """
 
+from pathlib import Path
+
 from src.data.loader import load_data
 from src.data.preprocessing import prepare_data
 
@@ -40,6 +42,12 @@ from src.explainability.shap_analysis import (
     SHAPExplainer,
 )
 
+from src.evaluation.error_analysis import (
+    create_error_dataframe,
+    get_misclassified_samples,
+    split_errors,
+    save_error_analysis,
+)
 
 def main():
 
@@ -235,6 +243,43 @@ def main():
     print(
         f"Maximum Confidence : {confidence_scores.max():.4f}"
     )
+    ############################################################
+    # Error Analysis
+    ############################################################
+
+    print("\nRunning Error Analysis...")
+
+    error_df = create_error_dataframe(
+        X_test=X_test,
+        y_test=y_test,
+        rf_predictions=rf_predictions,
+        lr_predictions=lr_predictions,
+        rule_predictions=rule_predictions,
+        hybrid_predictions=hybrid_predictions,
+        confidence_scores=confidence_scores,
+    )
+
+    misclassified = get_misclassified_samples(
+        error_df,
+    )
+
+    false_positive, false_negative = split_errors(
+        misclassified,
+    )
+
+    save_error_analysis(
+        error_df,
+        output_dir=Path("results/tables"),
+    )
+
+    print("\nError Summary")
+    print("-" * 40)
+
+    print(f"Total Samples         : {len(error_df)}")
+    print(f"Correct Predictions   : {error_df['Correct'].sum()}")
+    print(f"Incorrect Predictions : {len(misclassified)}")
+    print(f"False Positives       : {len(false_positive)}")
+    print(f"False Negatives       : {len(false_negative)}")
 
     print("\nDone!")
 
