@@ -1,6 +1,8 @@
 # Hybrid Network Intrusion Detection System
 
-A modular, explainable Hybrid Network Intrusion Detection System (IDS) built using machine learning and rule-based detection. The system combines Random Forest, Logistic Regression, and an adaptive Rule Engine through a weighted ensemble to improve intrusion detection performance while providing interpretable predictions using SHAP.
+A modular and explainable Hybrid Network Intrusion Detection System (IDS) that combines machine learning and rule-based detection for network attack classification using the NSL-KDD dataset.
+
+The system combines Random Forest, Logistic Regression, and an adaptive Rule Engine through a weighted decision fusion strategy. SHAP is used to analyze the contribution of individual features to the Random Forest predictions.
 
 ---
 
@@ -9,16 +11,17 @@ A modular, explainable Hybrid Network Intrusion Detection System (IDS) built usi
 - Modular Python project architecture
 - Random Forest classifier
 - Logistic Regression classifier
-- Adaptive Rule-Based anomaly detector
-- Weighted Hybrid Ensemble
+- Adaptive rule-based detector
+- Weighted hybrid ensemble
 - Confidence score estimation
 - SHAP-based model explainability
-- Automated evaluation and visualization pipeline
-- Reproducible experiments
+- Feature importance analysis
+- Confusion matrix visualization
+- Automated evaluation and reporting
 
 ---
 
-# Dataset
+## Dataset
 
 This project uses the **NSL-KDD** benchmark dataset for network intrusion detection.
 
@@ -26,30 +29,39 @@ The dataset is **not included** in this repository.
 
 Download the following files and place them inside the `data/` directory:
 
-```
+```text
 KDDTrain+.txt
 KDDTest+.txt
 ```
 
 The repository already includes:
 
-```
+```text
 feature_names.txt
 ```
+
+The system performs binary classification:
+
+- `0` — Normal
+- `1` — Attack
 
 ---
 
 # Methodology
 
-The proposed IDS consists of four major components.
+The IDS consists of four major components.
 
 ## 1. Data Preprocessing
 
-- Load NSL-KDD dataset
-- Label encoding of categorical features
-- Missing value handling
-- Feature preparation
+The preprocessing pipeline includes:
+
+- Loading the NSL-KDD dataset
+- Assigning feature names
+- Handling categorical features through label encoding
+- Handling missing values
+- Preparing training and testing features
 - Binary attack classification
+- Feature scaling for Logistic Regression
 
 ---
 
@@ -57,90 +69,101 @@ The proposed IDS consists of four major components.
 
 ### Random Forest
 
-- Ensemble tree classifier
-- High detection capability
-- Feature importance analysis
+A Random Forest classifier is used as the primary tree-based model.
+
+It also provides feature importance values that are used for model interpretation.
 
 ### Logistic Regression
 
-- Linear classifier
-- Standardized features
-- Probability calibration
+Logistic Regression provides a complementary linear classification model.
+
+The input features are standardized before training.
 
 ---
 
 ## 3. Rule-Based Detector
 
-A lightweight adaptive detector that identifies suspicious traffic using feature-based heuristics.
+A lightweight adaptive rule engine provides an additional heuristic signal for intrusion detection.
 
-The rule engine complements the machine learning models by improving robustness on uncertain samples.
+The rule engine uses selected network traffic features and thresholds derived from the training data. The resulting rule prediction is incorporated into the final hybrid decision.
 
 ---
 
 ## 4. Hybrid Ensemble
 
-The final prediction is obtained using a weighted ensemble:
+The predictions from the three components are combined using a weighted decision fusion strategy:
 
 | Component | Weight |
-|-----------|--------|
+|-----------|-------:|
 | Random Forest | 0.60 |
 | Logistic Regression | 0.30 |
 | Rule Engine | 0.10 |
 
-The ensemble also computes a confidence score for every prediction.
-
----
-
-# Explainability
-
-The project integrates **SHAP (SHapley Additive Explanations)** to interpret model decisions.
-
-Available visualizations include:
-
-- SHAP Summary Plot
-- SHAP Beeswarm Plot
-- SHAP Waterfall Plot
-- Random Forest Feature Importance
+The system also calculates a confidence score for each final prediction.
 
 ---
 
 # Results
 
-Representative outputs are provided in the `results/` directory.
+The Hybrid IDS was evaluated on the NSL-KDD test dataset containing **22,544 test samples**.
 
-## Included
+### Hybrid IDS Performance
 
-### Figures
+| Metric | Hybrid IDS |
+|--------|-----------:|
+| Accuracy | 75.61% |
+| Precision | 96.75% |
+| Recall | 59.14% |
+| F1-score | 73.41% |
 
-- Hybrid IDS Confusion Matrix
-- Feature Importance
-- SHAP Summary
-- SHAP Beeswarm
+The Hybrid IDS correctly classified **17,046** out of 22,544 test samples.
 
-### Reports
+The evaluation produced:
 
-- Random Forest Classification Report
-- Logistic Regression Classification Report
-- Hybrid IDS Classification Report
+- **5,498** incorrect predictions
+- **255** false positives
+- **5,243** false negatives
 
-### Tables
+### Hybrid IDS Confusion Matrix
 
-- Feature Importance CSV
-- Sample Predictions
+![Hybrid IDS Confusion Matrix](results/figures/hybrid_ids_confusion_matrix.png)
+
+---
+
+## Feature Importance
+
+Random Forest feature importance is used to identify the features that contribute most strongly to the model's predictions.
+
+![Random Forest Feature Importance](results/figures/feature_importance.png)
+
+---
+
+# Explainability
+
+The project integrates **SHAP (SHapley Additive exPlanations)** to analyze the contribution of individual features to Random Forest predictions.
+
+### SHAP Feature Importance
+
+![SHAP Feature Importance](results/figures/shap_bar.png)
+
+### SHAP Feature Impact
+
+![SHAP Beeswarm Plot](results/figures/shap_beeswarm.png)
+
+SHAP waterfall plots are also generated for individual predictions.
 
 ---
 
 # Installation
 
-Clone the repository
+Clone the repository:
 
 ```bash
 git clone https://github.com/tamaghnakundu/network-intrusion-detection.git
-
 cd network-intrusion-detection
 ```
 
-Install dependencies
+Install the required dependencies:
 
 ```bash
 pip install -r requirements.txt
@@ -150,35 +173,26 @@ pip install -r requirements.txt
 
 # Usage
 
-After downloading the NSL-KDD dataset into the `data/` folder:
+After downloading the NSL-KDD dataset and placing the required files in the `data/` directory, run:
 
 ```bash
 python main.py
 ```
 
-The pipeline automatically:
+The pipeline:
 
-- loads the dataset
-- preprocesses the data
-- trains all models
-- evaluates performance
-- generates explainability plots
-- saves reports
-- computes hybrid predictions
+1. Loads the dataset
+2. Preprocesses the data
+3. Trains the Random Forest model
+4. Trains the Logistic Regression model
+5. Runs the rule-based detector
+6. Generates hybrid predictions
+7. Evaluates model performance
+8. Generates feature importance visualizations
+9. Generates SHAP explanations
+10. Saves reports and generated outputs
 
-Generated files are written to the `outputs/` directory.
-
----
-
-# Repository Contents
-
-| Directory | Description |
-|------------|-------------|
-| `src/` | Source code |
-| `data/` | Dataset configuration |
-| `results/` | Curated figures and reports |
-| `outputs/` | Auto-generated artifacts |
-| `notebooks/` | Research notebook |
+Automatically generated files are written to the `outputs/` directory.
 
 ---
 
@@ -196,21 +210,10 @@ Generated files are written to the `outputs/` directory.
 
 # Future Improvements
 
-- Deep learning based IDS
+- Evaluation on modern intrusion detection datasets
+- Detailed false positive and false negative analysis
+- Improved hybrid decision fusion
+- Deep learning-based intrusion detection
+- Real-time network traffic analysis
+- Extended explainability for the hybrid ensemble
 - Streaming intrusion detection
-- Real-time packet analysis
-- AutoML for model selection
-- Explainable ensemble optimization
-- Web-based IDS dashboard
-
----
-
-# Author
-
-**Tamaghna Kundu**
-
-B.Tech Computer Science and Engineering
-
-SOA University
-
-Interested in Machine Learning, Cybersecurity, and Explainable AI.
