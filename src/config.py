@@ -1,5 +1,8 @@
-from pathlib import Path
 
+from pathlib import Path
+import numpy as np
+
+# Project directories
 ROOT = Path(__file__).resolve().parent.parent
 
 DATA_DIR = ROOT / "data"
@@ -9,32 +12,32 @@ PLOT_DIR = OUTPUT_DIR / "plots"
 MODEL_DIR = OUTPUT_DIR / "models"
 REPORT_DIR = OUTPUT_DIR / "reports"
 
+# Dataset paths
 TRAIN_DATA = DATA_DIR / "KDDTrain+.txt"
 TEST_DATA = DATA_DIR / "KDDTest+.txt"
-FEATURE_NAMES = DATA_DIR / "feature_names.txt"
 
-# Automatically create output folders
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-PLOT_DIR.mkdir(parents=True, exist_ok=True)
-MODEL_DIR.mkdir(parents=True, exist_ok=True)
-REPORT_DIR.mkdir(parents=True, exist_ok=True)
+# Automatically create output directories
+for directory in [OUTPUT_DIR, PLOT_DIR, MODEL_DIR, REPORT_DIR]:
+    directory.mkdir(parents=True, exist_ok=True)
 
+# Reproducibility
 RANDOM_STATE = 42
 
+# Validation configuration
+VALIDATION_SIZE = 0.20
+CV_FOLDS = 3
+
+# Random Forest
 RF_ESTIMATORS = 500
+
+# Logistic Regression
 LR_MAX_ITER = 5000
 
-RULE_PERCENTILE = 0.95
-RULE_MIN_SCORE = 2
+# SHAP explainability
+SHAP_SAMPLE_SIZE = 300
 
-HYBRID_WEIGHTS = {
-    "rf": 0.6,
-    "lr": 0.3,
-    "rule": 0.1,
-}
+# Ensemble weight optimization
+WEIGHT_GRID = [round(x, 1) for x in np.arange(0.0, 1.01, 0.1)]
 
-HYBRID_THRESHOLD = 0.3
-
-TOP_FEATURES = 15
-
-SHAP_SAMPLE_SIZE = 500
+# Classification threshold optimization
+THRESHOLD_GRID = np.arange(0.10, 0.91, 0.02)

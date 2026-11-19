@@ -1,70 +1,106 @@
+
 """
-Data preprocessing for the Hybrid Intrusion Detection System.
+Data preprocessing for the Network Intrusion Detection System.
+
+Uses ColumnTransformer to handle numerical and categorical
+features separately.
+
+Numerical features:
+    - Median imputation
+    - Standard scaling
+
+Categorical features:
+    - Most frequent imputation
+    - One-hot encoding
 """
 
-import pandas as pd
+from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
 
 
-def prepare_data(train_df, test_df):
+# Categorical features in NSL-KDD
+CATEGORICAL_COLUMNS = [
+    "protocol_type",
+    "service",
+    "flag",
+]
+
+
+def build_preprocessor(X):
     """
-    Prepare the training and test datasets.
+    Construct the preprocessing pipeline.
 
     Parameters
     ----------
-    train_df : pandas.DataFrame
-        Training dataset.
-
-    test_df : pandas.DataFrame
-        Test dataset.
+    X : pandas.DataFrame
+        Raw feature DataFrame.
 
     Returns
     -------
-    X_train : pandas.DataFrame
-        Training features.
-
-    X_test : pandas.DataFrame
-        Test features.
-
-    y_train : pandas.Series
-        Training labels.
-
-    y_test : pandas.Series
-        Test labels.
-
-    feature_names : list
-        Names of the training features.
+    sklearn.compose.ColumnTransformer
+        Configured preprocessing pipeline.
     """
 
-    train_df = train_df.copy()
-    test_df = test_df.copy()
+    categorical_columns = [
+        column
+        for column in CATEGORICAL_COLUMNS
+        if column in X.columns
+    ]
 
-    # Remove columns not used for training
-    X_train = train_df.drop(
-        columns=["label", "difficulty"],
-        errors="ignore",
+    numerical_columns = [
+        column
+        for column in X.columns
+        if column not in categorical_columns
+    ]
+
+    # Numerical preprocessing
+    numerical_pipeline = Pipeline(
+        steps=[
+            (
+                "imputer",
+                SimpleImputer(strategy="median"),
+            ),
+            (
+                "scaler",
+                StandardScaler(),
+            ),
+        ]
     )
 
-    X_test = test_df.drop(
-        columns=["label", "difficulty"],
-        errors="ignore",
+    # Categorical preprocessing
+    categorical_pipeline = Pipeline(
+        steps=[
+            (
+                "imputer",
+                SimpleImputer(strategy="most_frequent"),
+            ),
+            (
+                "encoder",
+                OneHotEncoder(
+                    handle_unknown="ignore",
+                    sparse_output=True,
+                ),
+            ),
+        ]
     )
 
-    y_train = train_df["label"]
-
-    y_test = test_df["label"]
-
-    # Fill missing values (if any)
-    X_train = X_train.fillna(0)
-
-    X_test = X_test.fillna(0)
-
-    # Store the exact feature names used for training
-    feature_names = X_train.columns.tolist()
-
-    return (
-        X_train,
-        X_test,
-        y_train,
-        y_test,
-        feature_names,
+    # Combine both pipelines
+    preprocessor = ColumnTransformer(
+        transformers=[
+            (
+                "numerical",
+                numerical_pipeline,
+                numerical_columns,
+            ),
+            (
+                "categorical",
+                categorical_pipeline,
+                categorical_columns,
+            ),
+        ],
+        remainder="drop",
     )
+
+    return preprocessor
